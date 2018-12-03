@@ -3,7 +3,6 @@
 
 ObjExporter::ObjExporter(const ObjParser& obj)
 {
-	using IndexType = uint32_t;
 	std::map<ObjParser::Face, IndexType> faceMap;
 
 	for (auto& g : obj.m_groups)

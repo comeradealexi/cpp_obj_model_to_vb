@@ -115,9 +115,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="ObjExporter.h" />
     <ClInclude Include="ObjParser.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="ObjExporter.cpp" />
     <ClCompile Include="ObjParser.cpp" />
     <ClCompile Include="Source.cpp" />
   </ItemGroup>
