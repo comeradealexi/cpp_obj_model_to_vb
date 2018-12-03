@@ -6,32 +6,23 @@
 
 class ObjParser
 {
-public:
-	ObjParser(const std::string& strObjFile);
-	~ObjParser();
-
+	friend class ObjExporter;
 public:
 	using Float4 = std::array<float, 4>;
 	using Float3 = std::array<float, 3>;
 	using Float2 = std::array<float, 2>;
 
-	struct Export
-	{
-		struct VB
-		{
-			Float3 m_position;
-			Float3 m_normal;
-			Float2 m_uv;
-		};
+public:
+	ObjParser(const std::string& strObjFile);
+	Export GenerateExport();
+	~ObjParser();
 
-		std::vector<VB> m_vb;
-	};
-
+public:
 	struct Face
 	{
-		uint16_t positionIndex = 1;
-		uint16_t normalIndex = 1;
-		uint16_t uvIndex = 1;
+		uint32_t positionIndex = 0;
+		uint32_t normalIndex = 0;
+		uint32_t uvIndex = 0;
 
 		inline bool operator==(const Face &f)  const
 		{
@@ -43,27 +34,20 @@ public:
 			return std::tie(positionIndex, normalIndex, uvIndex) < std::tie(f.positionIndex, f.normalIndex, f.uvIndex);
 		}
 
-		void Set(uint16_t value, int index)
+		void Set(uint32_t value, int index)
 		{
 			if (index == 0)
 			{
-				uvIndex = normalIndex = positionIndex = value;
+				positionIndex = value;
 			}
 			else if (index == 1)
 			{
-				normalIndex = value;
+				uvIndex = value;
 			}
 			else if (index == 2)
 			{
-				uvIndex = value;
+				normalIndex = value;
 			}
-		}
-
-		void FixArrayOffset()
-		{
-			positionIndex -= 1;
-			normalIndex -= 1;
-			uvIndex -= 1;
 		}
 	};
 
@@ -97,8 +81,15 @@ public:
 	};
 
 private:
+	bool IsEndLineCharacter(char c)
+	{
+		return (c == '\n' || c == '\r' || c == '\0');
+	}
+	bool IsNotEndLineCharacter(char c)
+	{
+		return (c != '\n' || c != '\r' || c != '\0');
+	}
 	void Parse(std::fstream& fStream);
-
 	void LoadMaterialFile();
 	void ProcessGroup(const std::string& line);
 	void ProcessMaterialUsage(const std::string& line);
@@ -113,10 +104,9 @@ private:
 	template<size_t ARRAY_SIZE>
 	void ProcessFloats(std::array<float, ARRAY_SIZE>& floatArray, const std::string& line);
 
-	Export GenerateExport();
 
 	std::string m_strObjFile;
-	std::vector<Float4> m_positions;
+	std::vector<Float3> m_positions;
 	std::vector<Float3> m_normals;
 	std::vector<Float2> m_uvs;
 	std::vector<Group>	m_groups;

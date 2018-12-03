@@ -52,6 +52,10 @@ private:
 
 ObjParser::ObjParser(const std::string& strObjFile) : m_strObjFile(strObjFile)
 {
+	m_positions.push_back( {0.0f,0.0f,0.0f});
+	m_normals.push_back({ 0.0f, 1.0f, 0.0f });
+	m_uvs.push_back({ 0.0f, 0.0f });
+
 	std::fstream fStream(m_strObjFile);
 	Parse(fStream);
 }
@@ -82,23 +86,6 @@ void ObjParser::ProcessFloats(std::array<float, ARRAY_SIZE>& floatArray, const s
 		if (index >= floatArray.size())
 			break;
 	}
-}
-
-ObjParser::Export ObjParser::GenerateExport()
-{
-	std::map<Face, uint64_t> faceMap;
-
-	Export outObj;
-
-
-	for (auto& g : m_groups)
-	{
-
-
-
-	}
-
-	return outObj;
 }
 
 void ObjParser::Parse(std::fstream& fStream)
@@ -212,7 +199,7 @@ void ObjParser::ProcessMaterialSource(const std::string& line)
 
 void ObjParser::ProcessVert(const std::string& line)
 {
-	Float4 vPosition = { 0.0f,0.0f,0.0f,1.0f };
+	Float3 vPosition = { 0.0f,0.0f,0.0f };
 	ProcessFloats(vPosition, line);
 	m_positions.push_back(vPosition);
 }
@@ -240,7 +227,7 @@ void ObjParser::ProcessFace(const std::string& line)
 	int currentFaceType = 0;
 	std::size_t nextPos = 0;
 
-	while (nextPos < strLength && (line[nextPos] != '\n' || line[nextPos] != '\r' || line[nextPos] != '\0'))
+	while (nextPos < strLength && (IsNotEndLineCharacter(line[nextPos])))
 	{
 		if (line[nextPos] == '/')
 		{
@@ -248,7 +235,7 @@ void ObjParser::ProcessFace(const std::string& line)
 			nextPos++;
 			continue;
 		}
-		else if (line[nextPos] == ' ')
+		else if (line[nextPos] == ' ' || IsEndLineCharacter(line[nextPos]))
 		{
 			currentFaceType = 0;
 			newFaces.push_back(currentFace);
@@ -259,14 +246,23 @@ void ObjParser::ProcessFace(const std::string& line)
 
 		size_t shiftPosition = 0;
 		int iVal = std::stoi(&line.at(nextPos), &shiftPosition);
-		currentFace.Set(static_cast<uint16_t>(iVal), currentFaceType);
+		if (iVal < 0)
+		{
+			int sizeOfLast;
+			if (currentFaceType == 0)
+				sizeOfLast = m_positions.size();
+			else if (currentFaceType == 1)
+				sizeOfLast = m_uvs.size();
+			else
+				sizeOfLast = m_normals.size();
+			iVal = iVal + sizeOfLast;
+		}
+		currentFace.Set(static_cast<uint32_t>(iVal), currentFaceType);
 		nextPos += shiftPosition;
 	}
-	newFaces.push_back(currentFace);
+	//newFaces.push_back(currentFace);
 
-	//Obj face index 1 = first element. We'll change here to match up to an array index.
-	for (auto& face : newFaces)
-		face.FixArrayOffset();
+	//We don't have to offset the array indices because there is a default values at index 0, so the obj format matches up.
 
 	//Add tris, if there are 4 (1,2,3,4) it will add 1,2,3 then 2,3,4.
 	size_t faceCount = newFaces.size();
