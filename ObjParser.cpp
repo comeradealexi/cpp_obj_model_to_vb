@@ -220,8 +220,9 @@ void ObjParser::ProcessTextureCoordinate(const std::string& line)
 
 void ObjParser::ProcessFace(const std::string& line)
 {
-	const std::size_t strLength = line.length();
+	const std::size_t strLength = line.length() + 1;
 
+	bool bAddFace = false;
 	Face currentFace;
 	std::vector<Face> newFaces;
 	int currentFaceType = 0;
@@ -238,9 +239,11 @@ void ObjParser::ProcessFace(const std::string& line)
 		else if (line[nextPos] == ' ' || IsEndLineCharacter(line[nextPos]))
 		{
 			currentFaceType = 0;
-			newFaces.push_back(currentFace);
+			if (bAddFace)
+				newFaces.push_back(currentFace);
 			currentFace = {};
 			nextPos++;
+			bAddFace = false;
 			continue;
 		}
 
@@ -259,6 +262,7 @@ void ObjParser::ProcessFace(const std::string& line)
 		}
 		currentFace.Set(static_cast<uint32_t>(iVal), currentFaceType);
 		nextPos += shiftPosition;
+		bAddFace = true;
 	}
 	//newFaces.push_back(currentFace);
 
@@ -269,7 +273,7 @@ void ObjParser::ProcessFace(const std::string& line)
 	int idx = 0;
 	while (faceCount >= 3)
 	{
-		m_groups.back().faces.push_back(newFaces[idx]);
+		m_groups.back().faces.push_back(newFaces[0]);
 		m_groups.back().faces.push_back(newFaces[idx + 1]);
 		m_groups.back().faces.push_back(newFaces[idx + 2]);
 		faceCount--;

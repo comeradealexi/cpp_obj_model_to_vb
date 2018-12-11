@@ -6,7 +6,7 @@
 
 class ObjParser
 {
-	friend class ObjExporter;
+	friend struct ObjExporter;
 public:
 	using Float4 = std::array<float, 4>;
 	using Float3 = std::array<float, 3>;
@@ -14,7 +14,6 @@ public:
 
 public:
 	ObjParser(const std::string& strObjFile);
-	Export GenerateExport();
 	~ObjParser();
 
 public:
