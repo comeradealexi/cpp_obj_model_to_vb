@@ -24,12 +24,24 @@
     <ClCompile Include="ObjExporter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ObjFileWriter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ObjFileReader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ObjParser.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ObjExporter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ObjFileWriter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ObjFileReader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -5,6 +5,7 @@ struct ObjExporter
 {
 	using IndexType = uint32_t;
 	ObjExporter(const ObjParser& obj);
+	ObjExporter() { }
 
 	struct VB
 	{

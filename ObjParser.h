@@ -89,6 +89,8 @@ private:
 		return (c != '\n' || c != '\r' || c != '\0');
 	}
 	void Parse(std::fstream& fStream);
+	ObjParser::Float3 CalculateNormal(uint32_t v1, uint32_t v2, uint32_t v3);
+	void GenerateNormals();
 	void LoadMaterialFile();
 	void ProcessGroup(const std::string& line);
 	void ProcessMaterialUsage(const std::string& line);

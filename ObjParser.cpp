@@ -3,6 +3,7 @@
 #include <string>
 #include <functional>
 #include <map>
+#include <unordered_map>
 
 class LineParser
 {
@@ -114,6 +115,36 @@ void ObjParser::Parse(std::fstream& fStream)
 	LoadMaterialFile();
 }
 
+ObjParser::Float3 ObjParser::CalculateNormal(uint32_t v1, uint32_t v2, uint32_t v3)
+{
+
+}
+
+void ObjParser::GenerateNormals()
+{
+	using VertexKey = std::tuple<uint32_t, uint32_t, uint32_t>;
+	using NormalIndex = uint32_t;
+	std::unordered_map<VertexKey, NormalIndex> normalDictionary;
+
+	if (m_normals.size() <= 1)
+	{
+		for (auto& model : m_groups)
+		{
+			for (size_t i = 0; i < model.faces.size(); i += 3)
+			{
+				auto& f1 = model.faces[i];
+				auto& f2 = model.faces[i + 1];
+				auto& f3 = model.faces[i + 2];
+
+				if (f1.normalIndex == 0 && f2.normalIndex == 0 && f3.normalIndex == 0)
+				{
+					
+				}
+			}
+		}
+	}
+}
+
 std::string ObjParser::CreateMaterialFilePath(const std::string& str)
 {
 	std::string strObjPath = m_strObjFile;
@@ -151,21 +182,21 @@ void ObjParser::LoadMaterialFile()
 		if (matFileHandle.good())
 		{
 			std::vector<LineParser> parserList;
-			parserList.emplace_back("newmtl",	[&](ObjParser* pThis, const std::string& str) { m_materials.push_back(str); });
-			parserList.emplace_back("Ka",		[&](ObjParser* pThis, const std::string& str) { ProcessFloats(m_materials.back().colourAmbient, str); });
-			parserList.emplace_back("Kd",		[&](ObjParser* pThis, const std::string& str) { ProcessFloats(m_materials.back().colourDiffuse, str); });
-			parserList.emplace_back("Ks",		[&](ObjParser* pThis, const std::string& str) { ProcessFloats(m_materials.back().colourSpecular, str); });
-			parserList.emplace_back("Ns",		[&](ObjParser* pThis, const std::string& str) { m_materials.back().weightSpecular = std::stof(str); });
-			parserList.emplace_back("illum",	[&](ObjParser* pThis, const std::string& str) { m_materials.back().illuminationType = std::stoul(str); });
-			parserList.emplace_back("map_Ka",	[&](ObjParser* pThis, const std::string& str) { m_materials.back().textureAmbient = str; });
-			parserList.emplace_back("map_Kd",	[&](ObjParser* pThis, const std::string& str) { m_materials.back().textureDiffuse = str; });
-			parserList.emplace_back("map_bump", [&](ObjParser* pThis, const std::string& str) { m_materials.back().textureBump = str; });
-			parserList.emplace_back("bump",		[&](ObjParser* pThis, const std::string& str) { m_materials.back().textureBump = str; });
-			parserList.emplace_back("map_Ks",	[&](ObjParser* pThis, const std::string& str) { m_materials.back().textureSpecular = str; });
-			parserList.emplace_back("map_Ns",	[&](ObjParser* pThis, const std::string& str) { m_materials.back().textureHighlight = str; });
-			parserList.emplace_back("map_d",	[&](ObjParser* pThis, const std::string& str) { m_materials.back().textureAlpha = str; });
-			parserList.emplace_back("disp",		[&](ObjParser* pThis, const std::string& str) { m_materials.back().textureDisplacement = str; });
-			parserList.emplace_back("d",		[&](ObjParser* pThis, const std::string& str) { m_materials.back().alpha = std::stof(str); });
+			parserList.emplace_back("newmtl",	[&](ObjParser* /*pThis*/, const std::string& str) { m_materials.push_back(str); });
+			parserList.emplace_back("Ka",		[&](ObjParser* /*pThis*/, const std::string& str) { ProcessFloats(m_materials.back().colourAmbient, str); });
+			parserList.emplace_back("Kd",		[&](ObjParser* /*pThis*/, const std::string& str) { ProcessFloats(m_materials.back().colourDiffuse, str); });
+			parserList.emplace_back("Ks",		[&](ObjParser* /*pThis*/, const std::string& str) { ProcessFloats(m_materials.back().colourSpecular, str); });
+			parserList.emplace_back("Ns",		[&](ObjParser* /*pThis*/, const std::string& str) { m_materials.back().weightSpecular = std::stof(str); });
+			parserList.emplace_back("illum",	[&](ObjParser* /*pThis*/, const std::string& str) { m_materials.back().illuminationType = std::stoul(str); });
+			parserList.emplace_back("map_Ka",	[&](ObjParser* /*pThis*/, const std::string& str) { m_materials.back().textureAmbient = str; });
+			parserList.emplace_back("map_Kd",	[&](ObjParser* /*pThis*/, const std::string& str) { m_materials.back().textureDiffuse = str; });
+			parserList.emplace_back("map_bump", [&](ObjParser* /*pThis*/, const std::string& str) { m_materials.back().textureBump = str; });
+			parserList.emplace_back("bump",		[&](ObjParser* /*pThis*/, const std::string& str) { m_materials.back().textureBump = str; });
+			parserList.emplace_back("map_Ks",	[&](ObjParser* /*pThis*/, const std::string& str) { m_materials.back().textureSpecular = str; });
+			parserList.emplace_back("map_Ns",	[&](ObjParser* /*pThis*/, const std::string& str) { m_materials.back().textureHighlight = str; });
+			parserList.emplace_back("map_d",	[&](ObjParser* /*pThis*/, const std::string& str) { m_materials.back().textureAlpha = str; });
+			parserList.emplace_back("disp",		[&](ObjParser* /*pThis*/, const std::string& str) { m_materials.back().textureDisplacement = str; });
+			parserList.emplace_back("d",		[&](ObjParser* /*pThis*/, const std::string& str) { m_materials.back().alpha = std::stof(str); });
 
 			std::string line;
 			while (std::getline(matFileHandle, line))
@@ -253,11 +284,11 @@ void ObjParser::ProcessFace(const std::string& line)
 		{
 			int sizeOfLast;
 			if (currentFaceType == 0)
-				sizeOfLast = m_positions.size();
+				sizeOfLast = static_cast<int>(m_positions.size());
 			else if (currentFaceType == 1)
-				sizeOfLast = m_uvs.size();
+				sizeOfLast = static_cast<int>(m_uvs.size());
 			else
-				sizeOfLast = m_normals.size();
+				sizeOfLast = static_cast<int>(m_normals.size());
 			iVal = iVal + sizeOfLast;
 		}
 		currentFace.Set(static_cast<uint32_t>(iVal), currentFaceType);
