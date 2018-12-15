@@ -11,7 +11,7 @@ ObjExporter::ObjExporter(const ObjParser& obj)
 	{
 		for (auto& face : g.faces)
 		{
-			auto it = faceMap.find(face);
+			auto it = faceMap.find(face);	
 			if (it != faceMap.end())
 			{
 				m_indices.push_back(it->second);

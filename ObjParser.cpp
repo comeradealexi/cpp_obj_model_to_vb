@@ -111,23 +111,48 @@ void ObjParser::Parse(std::fstream& fStream)
 				break;
 		}
 	}
-
+	GenerateNormals();
 	LoadMaterialFile();
 }
 
 ObjParser::Float3 ObjParser::CalculateNormal(uint32_t v1, uint32_t v2, uint32_t v3)
 {
+	const auto& vert1 = m_positions[v1];
+	const auto& vert2 = m_positions[v2];
+	const auto& vert3 = m_positions[v3];
 
+	const auto x1 = vert1[0] - vert2[0];
+	const auto y1 = vert1[1] - vert2[1];
+	const auto z1 = vert1[2] - vert2[2];
+
+	const auto x2 = vert2[0] - vert3[0];
+	const auto y2 = vert2[1] - vert3[1];
+	const auto z2 = vert2[2] - vert3[2];
+
+	Float3 fOut;
+	fOut[0] = (y1 * z2) - (z1 * y2);
+	fOut[1] = (z1 * x2) - (x1 * z2);
+	fOut[2] = (x1 * y2) - (y1 * x2);
+
+	//Normalise
+	float len = sqrtf(fOut[0] * fOut[0] + fOut[1] * fOut[1] + fOut[2] * fOut[2]);
+	fOut[0]	/= len;
+	fOut[1]	/= len;
+	fOut[2]	/= len;
+
+	return fOut;
 }
 
 void ObjParser::GenerateNormals()
 {
-	using VertexKey = std::tuple<uint32_t, uint32_t, uint32_t>;
-	using NormalIndex = uint32_t;
-	std::unordered_map<VertexKey, NormalIndex> normalDictionary;
-
 	if (m_normals.size() <= 1)
 	{
+		using NormalList = std::vector<Float3>;
+		std::vector<NormalList> vertexNormalList;
+		vertexNormalList.resize(m_positions.size());
+		m_normals.resize(m_positions.size());
+
+		std::cout << "Generating normals..." << std::endl;
 		for (auto& model : m_groups)
 		{
 			for (size_t i = 0; i < model.faces.size(); i += 3)
@@ -136,10 +161,46 @@ void ObjParser::GenerateNormals()
 				auto& f2 = model.faces[i + 1];
 				auto& f3 = model.faces[i + 2];
 
-				if (f1.normalIndex == 0 && f2.normalIndex == 0 && f3.normalIndex == 0)
+				Float3 calculateNormal = CalculateNormal(f1.positionIndex, f2.positionIndex, f3.positionIndex);
+				vertexNormalList[f1.positionIndex].push_back(calculateNormal);
+				vertexNormalList[f2.positionIndex].push_back(calculateNormal);
+				vertexNormalList[f3.positionIndex].push_back(calculateNormal);
+			
+				//Set the normal IDX to be the same as the position IDX.
+				f1.normalIndex = f1.positionIndex;
+				f2.normalIndex = f2.positionIndex;
+				f3.normalIndex = f3.positionIndex;
+			}
+		}
+
+		for (size_t i = 0; i < vertexNormalList.size(); i++)
+		{
+			auto& normalList = vertexNormalList[i];
+
+			if (normalList.size() > 0)
+			{
+				float fX = 0.0f, fY = 0.0f, fZ = 0.0f;
+				for (auto& normal : normalList)
 				{
-					
+					fX += normal[0];
+					fY += normal[1];
+					fZ += normal[2];
 				}
+				if (normalList.size() > 1)
+				{		
+					fX /= static_cast<float>(normalList.size());
+					fY /= static_cast<float>(normalList.size());
+					fZ /= static_cast<float>(normalList.size());
+
+					//Normalise
+					float len = sqrtf((fX * fX) + (fY * fY) + (fZ * fZ));
+					fX /= len;
+					fY /= len;
+					fZ /= len;
+				}
+				m_normals[i][0] = fX;
+				m_normals[i][1] = fY;
+				m_normals[i][2] = fZ;
 			}
 		}
 	}
