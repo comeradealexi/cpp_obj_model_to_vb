@@ -29,6 +29,12 @@ int main(int argc, const char *argv[])
 	if (objExport.m_indices.size() > INT32_MAX) std::cout << "IB Count exceeeds maximum for INT32_MAX of " << INT32_MAX << std::endl;
 	if (objExport.m_models.size() > INT32_MAX) std::cout << "MODEL Count exceeeds maximum for INT32_MAX of " << INT32_MAX << std::endl;
 
+	if (objExport.m_vb.size() == 0)
+	{
+		std::cout << "No verts. Not writing output file.\n";
+		return -1;
+	}
+
 	ObjFileWriter objFileWriter(objExport, objFileOut);
 	std::cout << "Output file has " << (objFileWriter.m_bFileWritten ? "been written." : "NOT been written.") << std::endl;
 

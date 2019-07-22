@@ -19,6 +19,7 @@ struct ObjFileWriter
 	static_assert(sizeof(FileHeader) == 20, "Should be 20?");
 
 	ObjFileWriter(const ObjExporter& obj, const std::string& strOutFileName);
+	void WriteMaterialFile(std::ofstream& outFile, const Material& material);
 
 	bool m_bFileWritten = false;
 };

@@ -58,6 +58,10 @@ ObjParser::ObjParser(const std::string& strObjFile) : m_strObjFile(strObjFile)
 	m_uvs.push_back({ 0.0f, 0.0f });
 
 	std::fstream fStream(m_strObjFile);
+	if (fStream.good() == false)
+	{
+		std::cout << "Failed To Open File: " << m_strObjFile << "\n";
+	}
 	Parse(fStream);
 }
 
@@ -100,7 +104,7 @@ void ObjParser::Parse(std::fstream& fStream)
 	parserList.emplace_back("usemtl", &ObjParser::ProcessMaterialUsage);
 	parserList.emplace_back("mtllib", &ObjParser::ProcessMaterialSource);
 
-	m_groups.emplace_back();
+	//m_groups.emplace_back();
 
 	std::string line;
 	while (std::getline(fStream, line))
@@ -115,7 +119,7 @@ void ObjParser::Parse(std::fstream& fStream)
 	LoadMaterialFile();
 }
 
-ObjParser::Float3 ObjParser::CalculateNormal(uint32_t v1, uint32_t v2, uint32_t v3)
+Float3 ObjParser::CalculateNormal(uint32_t v1, uint32_t v2, uint32_t v3)
 {
 	const auto& vert1 = m_positions[v1];
 	const auto& vert2 = m_positions[v2];
@@ -244,11 +248,11 @@ void ObjParser::LoadMaterialFile()
 		{
 			std::vector<LineParser> parserList;
 			parserList.emplace_back("newmtl",	[&](ObjParser* /*pThis*/, const std::string& str) { m_materials.push_back(str); });
-			parserList.emplace_back("Ka",		[&](ObjParser* /*pThis*/, const std::string& str) { ProcessFloats(m_materials.back().colourAmbient, str); });
-			parserList.emplace_back("Kd",		[&](ObjParser* /*pThis*/, const std::string& str) { ProcessFloats(m_materials.back().colourDiffuse, str); });
-			parserList.emplace_back("Ks",		[&](ObjParser* /*pThis*/, const std::string& str) { ProcessFloats(m_materials.back().colourSpecular, str); });
-			parserList.emplace_back("Ns",		[&](ObjParser* /*pThis*/, const std::string& str) { m_materials.back().weightSpecular = std::stof(str); });
-			parserList.emplace_back("illum",	[&](ObjParser* /*pThis*/, const std::string& str) { m_materials.back().illuminationType = std::stoul(str); });
+			parserList.emplace_back("Ka",		[&](ObjParser* /*pThis*/, const std::string& str) { ProcessFloats(m_materials.back().header.colourAmbient, str); });
+			parserList.emplace_back("Kd",		[&](ObjParser* /*pThis*/, const std::string& str) { ProcessFloats(m_materials.back().header.colourDiffuse, str); });
+			parserList.emplace_back("Ks",		[&](ObjParser* /*pThis*/, const std::string& str) { ProcessFloats(m_materials.back().header.colourSpecular, str); });
+			parserList.emplace_back("Ns",		[&](ObjParser* /*pThis*/, const std::string& str) { m_materials.back().header.weightSpecular = std::stof(str); });
+			parserList.emplace_back("illum",	[&](ObjParser* /*pThis*/, const std::string& str) { m_materials.back().header.illuminationType = std::stoul(str); });
 			parserList.emplace_back("map_Ka",	[&](ObjParser* /*pThis*/, const std::string& str) { m_materials.back().textureAmbient = str; });
 			parserList.emplace_back("map_Kd",	[&](ObjParser* /*pThis*/, const std::string& str) { m_materials.back().textureDiffuse = str; });
 			parserList.emplace_back("map_bump", [&](ObjParser* /*pThis*/, const std::string& str) { m_materials.back().textureBump = str; });
@@ -257,7 +261,7 @@ void ObjParser::LoadMaterialFile()
 			parserList.emplace_back("map_Ns",	[&](ObjParser* /*pThis*/, const std::string& str) { m_materials.back().textureHighlight = str; });
 			parserList.emplace_back("map_d",	[&](ObjParser* /*pThis*/, const std::string& str) { m_materials.back().textureAlpha = str; });
 			parserList.emplace_back("disp",		[&](ObjParser* /*pThis*/, const std::string& str) { m_materials.back().textureDisplacement = str; });
-			parserList.emplace_back("d",		[&](ObjParser* /*pThis*/, const std::string& str) { m_materials.back().alpha = std::stof(str); });
+			parserList.emplace_back("d",		[&](ObjParser* /*pThis*/, const std::string& str) { m_materials.back().header.alpha = std::stof(str); });
 
 			std::string line;
 			while (std::getline(matFileHandle, line))
@@ -281,7 +285,14 @@ void ObjParser::ProcessGroup(const std::string& line)
 
 void ObjParser::ProcessMaterialUsage(const std::string& line)
 {
-	m_groups.back().m_subMaterial = line;
+	if (m_groups.size() != 0)
+	{
+		m_groups.back().m_subMaterial = line;
+	}
+	else
+	{
+		std::cout << "Processing new material but there are no groups to add it to? Is the material defined before any group? The mateirals will be mixed up now.\n";
+	}
 }
 
 void ObjParser::ProcessMaterialSource(const std::string& line)

@@ -129,6 +129,7 @@
     <ClInclude Include="ObjFileReader.h" />
     <ClInclude Include="ObjFileWriter.h" />
     <ClInclude Include="ObjParser.h" />
+    <ClInclude Include="SharedTypes.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ObjExporter.cpp" />

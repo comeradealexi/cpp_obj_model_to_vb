@@ -1,4 +1,5 @@
 #pragma once
+#include "SharedTypes.h"
 #include <fstream>
 #include <array>
 #include <vector>
@@ -7,11 +8,6 @@
 class ObjParser
 {
 	friend struct ObjExporter;
-public:
-	using Float4 = std::array<float, 4>;
-	using Float3 = std::array<float, 3>;
-	using Float2 = std::array<float, 2>;
-
 public:
 	ObjParser(const std::string& strObjFile);
 	~ObjParser();
@@ -57,28 +53,6 @@ public:
 		std::string m_subMaterial;
 	};
 
-	//http://paulbourke.net/dataformats/mtl/
-	struct Material
-	{
-		Material(std::string strName) : name(strName) { }
-		std::string name;
-		Float3		colourAmbient = { 1.0f,1.0f,1.0f };
-		Float3		colourDiffuse = { 1.0f,1.0f,1.0f };
-		Float3		colourSpecular = { 1.0f,1.0f,1.0f };
-		float		weightSpecular = 1;
-		float		alpha = 1.0f;
-		uint32_t	illuminationType = 0;
-
-		std::string textureAmbient;
-		std::string textureDiffuse;
-		std::string textureSpecular;
-		std::string textureHighlight;
-		std::string textureBump;
-		std::string textureDisplacement;
-		std::string textureStencil;
-		std::string textureAlpha;
-	};
-
 private:
 	bool IsEndLineCharacter(char c)
 	{
@@ -89,7 +63,7 @@ private:
 		return (c != '\n' || c != '\r' || c != '\0');
 	}
 	void Parse(std::fstream& fStream);
-	ObjParser::Float3 CalculateNormal(uint32_t v1, uint32_t v2, uint32_t v3);
+	Float3 CalculateNormal(uint32_t v1, uint32_t v2, uint32_t v3);
 	void GenerateNormals();
 	void LoadMaterialFile();
 	void ProcessGroup(const std::string& line);

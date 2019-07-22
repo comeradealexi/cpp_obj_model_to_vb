@@ -15,5 +15,23 @@ ObjFileReader::ObjFileReader(const std::string& strInFile)
 		inFile.read((char*)m_loadedModel.m_vb.data(), m_loadedModel.m_vb.size() * sizeof(ObjExporter::VB));
 		inFile.read((char*)m_loadedModel.m_indices.data(), m_loadedModel.m_indices.size() * sizeof(ObjExporter::IndexType));
 		inFile.read((char*)m_loadedModel.m_models.data(), m_loadedModel.m_models.size() * sizeof(ObjExporter::Model));
+
+		uint32_t materialsCount;
+		inFile >> materialsCount;
+		m_loadedModel.m_materials.resize(materialsCount);
+		for (auto& material : m_loadedModel.m_materials)
+		{
+			inFile.read((char*)&material.header, sizeof(material.header));
+
+			std::getline(inFile, material.materialName, '\0');
+			std::getline(inFile, material.textureAmbient, '\0');
+			std::getline(inFile, material.textureDiffuse, '\0');
+			std::getline(inFile, material.textureSpecular, '\0');
+			std::getline(inFile, material.textureHighlight, '\0');
+			std::getline(inFile, material.textureBump, '\0');
+			std::getline(inFile, material.textureDisplacement, '\0');
+			std::getline(inFile, material.textureStencil, '\0');
+			std::getline(inFile, material.textureAlpha, '\0');
+		}
 	}
 }

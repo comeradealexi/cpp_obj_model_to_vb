@@ -44,5 +44,8 @@
     <ClInclude Include="ObjFileReader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="SharedTypes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

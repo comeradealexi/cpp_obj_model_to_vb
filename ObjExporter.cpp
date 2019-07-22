@@ -7,6 +7,10 @@ ObjExporter::ObjExporter(const ObjParser& obj)
 
 	uint32_t indexBufferStart = 0;
 	uint32_t indexBufferCount = 0;
+
+	//Copy the materials
+	m_materials = obj.m_materials;
+
 	for (auto& g : obj.m_groups)
 	{
 		for (auto& face : g.faces)
@@ -37,8 +41,20 @@ ObjExporter::ObjExporter(const ObjParser& obj)
 			newModel.m_indexOffset = indexBufferStart;
 			indexBufferStart = indexBufferCount;
 			indexBufferCount = 0;
+
+			uint32_t uMaterialIndex = 0;
+			for (const auto& material : m_materials)
+			{
+				if (material.materialName == g.m_subMaterial)
+				{
+					newModel.m_materialIndex = uMaterialIndex;
+					break;
+				}
+				uMaterialIndex++;
+			}
+
+			//Find the material
 			m_models.push_back(newModel);
 		}
 	}
-	
 }
