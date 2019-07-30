@@ -12,7 +12,7 @@
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LocalDebuggerCommandArguments>C:\Users\hough\source\repos\CrossPlatformGFX\SimpleConsoleProject\RawDataFiles\sponza_default\sponza.obj C:\Users\hough\source\repos\CrossPlatformGFX\SimpleConsoleProject\RawDataFiles\VB_sponza_new.vb</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>F:\comeradealexi\Projects\CrossPlatformGFX\SimpleConsoleProject\RawDataFiles\sponza_default\sponza.obj F:\comeradealexi\Projects\CrossPlatformGFX\SimpleConsoleProject\RawDataFiles\VB_sponza.vb</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">

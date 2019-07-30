@@ -285,14 +285,10 @@ void ObjParser::ProcessGroup(const std::string& line)
 
 void ObjParser::ProcessMaterialUsage(const std::string& line)
 {
-	if (m_groups.size() != 0)
-	{
-		m_groups.back().m_subMaterial = line;
-	}
-	else
-	{
-		std::cout << "Processing new material but there are no groups to add it to? Is the material defined before any group? The mateirals will be mixed up now.\n";
-	}
+	if (!m_groups.size())
+		m_groups.emplace_back();
+
+	m_groups.back().m_subMaterial = line;
 }
 
 void ObjParser::ProcessMaterialSource(const std::string& line)
@@ -376,6 +372,9 @@ void ObjParser::ProcessFace(const std::string& line)
 	int idx = 0;
 	while (faceCount >= 3)
 	{
+		if (!m_groups.size())
+			m_groups.emplace_back();
+
 		m_groups.back().faces.push_back(newFaces[0]);
 		m_groups.back().faces.push_back(newFaces[idx + 1]);
 		m_groups.back().faces.push_back(newFaces[idx + 2]);
