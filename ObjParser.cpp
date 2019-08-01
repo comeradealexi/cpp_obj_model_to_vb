@@ -117,6 +117,36 @@ void ObjParser::Parse(std::fstream& fStream)
 	}
 	GenerateNormals();
 	LoadMaterialFile();
+	ScaleModel();
+}
+
+void ObjParser::ScaleModel()
+{
+	float fMax = 0.0f;
+	for (const auto& p : m_positions)
+	{
+		fMax = std::max<float>(fMax, p[0]);
+		fMax = std::max<float>(fMax, p[1]);
+		fMax = std::max<float>(fMax, p[2]);
+	}
+
+	if (fMax > 1.0f)
+	{
+		for (auto& p : m_positions)
+		{
+			for (auto& f : p)
+				f /= fMax;
+		}
+	}
+	else if (fMax < 1.0f)
+	{
+		const float fMult = 1.0f / fMax;
+		for (auto& p : m_positions)
+		{
+			for (auto& f : p)
+				f *= fMult;
+		}
+	}
 }
 
 Float3 ObjParser::CalculateNormal(uint32_t v1, uint32_t v2, uint32_t v3)
@@ -286,7 +316,14 @@ void ObjParser::ProcessGroup(const std::string& line)
 void ObjParser::ProcessMaterialUsage(const std::string& line)
 {
 	if (!m_groups.size())
+	{
 		m_groups.emplace_back();
+	}
+	else if (m_groups.back().m_subMaterial != "")
+	{
+		m_groups.emplace_back();
+		m_groups.back().name = m_groups[m_groups.size() - 2].name + "_EXTRA_PART";
+	}
 
 	m_groups.back().m_subMaterial = line;
 }

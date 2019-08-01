@@ -39,7 +39,7 @@ ObjExporter::ObjExporter(const ObjParser& obj)
 			Model newModel;
 			newModel.m_indexCount = indexBufferCount;
 			newModel.m_indexOffset = indexBufferStart;
-			indexBufferStart = indexBufferCount;
+			indexBufferStart += indexBufferCount;
 			indexBufferCount = 0;
 
 			uint32_t uMaterialIndex = 0;

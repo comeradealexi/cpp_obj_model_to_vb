@@ -74,6 +74,7 @@ private:
 	void ProcessTextureCoordinate(const std::string& line);
 	void ProcessFace(const std::string& line);
 	std::string CreateMaterialFilePath(const std::string& str);
+	void ScaleModel();
 
 	void StripInitialDeadSpace(std::string& str);
 	template<size_t ARRAY_SIZE>
